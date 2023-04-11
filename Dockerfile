@@ -1,10 +1,20 @@
-FROM php:8.2-apache
+FROM richarvey/nginx-php-fpm:1.9.1
 
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    && docker-php-ext-install pdo_mysql
+COPY . .
 
-COPY . /var/www/html/
-COPY 000-default.conf /etc/apache2/sites-available/
-RUN a2enmod rewrite
+# Image config
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
+
+# Laravel config
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
+
+# Allow composer to run as root
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+CMD ["/start.sh"]
